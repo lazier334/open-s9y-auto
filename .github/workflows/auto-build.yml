@@ -69,6 +69,7 @@ jobs:
             {
               echo "body<<EOF"
               cat build/README.md
+              echo
               echo "EOF"
             } >> "$GITHUB_OUTPUT"
           else
