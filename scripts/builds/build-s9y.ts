@@ -54,7 +54,7 @@ function copyToBuild() {
 
 function extractGateway() {
   console.log("正在提取 s9y...");
-  const removeFiles = ['examples', '.gitignore'];
+  const removeFiles = ['examples', '.gitignore', '.git'];
   if (fs.existsSync(S9Y_BUILD_DIR)) {
     fs.readdirSync(S9Y_BUILD_DIR).forEach(name => {
       if (removeFiles.includes(name)) {
