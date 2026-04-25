@@ -32,7 +32,7 @@ jobs:
 
       # 执行项目构建命令，打包网关相关产物
       - name: Run auto build
-        run: npm run build:gateway
+        run: npm run build
 
       # 扫描 build 目录中的压缩包，准备 Release 所需的文件列表和说明
       - name: Collect archives and prepare release notes
