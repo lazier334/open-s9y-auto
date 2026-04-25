@@ -1,0 +1,87 @@
+name: Auto Build
+
+on:
+  push:
+    tags:
+      # 匹配语义化版本号，如 v1.2.3、v0.0.1
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release 版本号（如 v1.2.3）'
+        required: true
+        type: string
+
+jobs:
+  auto-build:
+    # 在最新的 Ubuntu 运行器上执行
+    runs-on: ubuntu-latest
+    # 授予创建 Release 的权限
+    permissions:
+      contents: write
+    steps:
+      # 检出当前仓库的代码
+      - name: Checkout open-s9y-auto
+        uses: actions/checkout@v4
+
+      # 设置 Node.js 环境，使用 24 版本
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      # 执行项目构建命令，打包网关相关产物
+      - name: Run auto build
+        run: npm run build:gateway
+
+      # 扫描 build 目录中的压缩包，准备 Release 所需的文件列表和说明
+      - name: Collect archives and prepare release notes
+        id: release-prep
+        run: |
+          # 支持的压缩包扩展名列表
+          ARCHIVE_EXTS=(".zip" ".tar.gz" ".tar.bz2" ".tar.xz")
+          FILES=""
+          FOUND=false
+
+          # 遍历每种扩展名，收集 build 目录中匹配的文件
+          for ext in "${ARCHIVE_EXTS[@]}"; do
+            for f in build/*"$ext"; do
+              [ -e "$f" ] || continue
+              FOUND=true
+              FILES="${FILES}${f}\n"
+            done
+          done
+
+          # 将扫描结果写入 GitHub Actions 输出变量
+          if [ "$FOUND" = "true" ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+            printf "files=%b\n" "$FILES" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          # 优先使用 build/README.md 作为 Release 描述
+          if [ -f "build/README.md" ]; then
+            {
+              echo "body<<EOF"
+              cat build/README.md
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
+          else
+            # 如果没有 README.md，则使用当前时间戳作为描述
+            TIMESTAMP=$(date +'%Y-%m-%d %H:%M:%S %Z')
+            echo "body=打包时间: ${TIMESTAMP}" >> "$GITHUB_OUTPUT"
+          fi
+
+      # 如果检测到压缩包，则自动创建 GitHub Release 并上传文件
+      - name: Release archives
+        if: steps.release-prep.outputs.found == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          # tag 触发时使用推送的 tag 名；手动触发时使用输入的版本号
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
+          name: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
+          body: ${{ steps.release-prep.outputs.body }}
+          files: ${{ steps.release-prep.outputs.files }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

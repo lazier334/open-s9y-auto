@@ -1,0 +1,32 @@
+{
+  "name": "open-s9y-auto",
+  "version": "1.0.0",
+  "description": "open-s9y 项目的自动化拓展",
+  "homepage": "https://github.com/lazier334/open-s9y-auto#readme",
+  "bugs": {
+    "url": "https://github.com/lazier334/open-s9y-auto/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lazier334/open-s9y-auto.git"
+  },
+  "license": "MIT",
+  "author": "laizer334",
+  "type": "module",
+  "main": "src/main.ts",
+  "scripts": {
+    "build": "node --env-file=.env --experimental-strip-types scripts/builds/buildAll.ts",
+    "dev": "node --env-file=.env --experimental-strip-types src/index.ts",
+    "test": "node --env-file=.env --experimental-strip-types --test test/**/*.test.ts",
+    "start": "node --env-file=.env --experimental-strip-types src/index.ts"
+  },
+  "dependencies": {
+    "fastify": "^5.8.5",
+    "ws": "^8.20.0"
+  },
+  "devDependencies": {
+    "@types/archiver": "^7.0.0",
+    "@types/node": "^25.6.0",
+    "archiver": "^7.0.1"
+  }
+}
