@@ -30,6 +30,10 @@ jobs:
         with:
           node-version: 24
 
+      # 安装项目依赖（包含 devDependencies）
+      - name: Install dependencies
+        run: npm ci
+
       # 执行项目构建命令，打包网关相关产物
       - name: Run auto build
         run: npm run build
