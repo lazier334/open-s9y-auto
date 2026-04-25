@@ -103,5 +103,6 @@ export default async function main(BUILD_DIR: string) {
     msg = `open-s9y 打包失败: ${result.error}`;
   }
 
-  return `open-s9y 当前版本: ${getGitHash(S9Y_DIR)}\n${msg}`
+  localHash = getGitHash(S9Y_DIR);
+  return `open-s9y 当前版本: [${localHash}](https://github.com/lazier334/open-s9y/commit/${localHash})  \n${msg}`
 }
