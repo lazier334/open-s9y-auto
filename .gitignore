@@ -1,6 +1,9 @@
 # s9y
 s9y
 build
+.other
+examples
+projects
 
 # Logs
 logs
