@@ -7,7 +7,7 @@ const { values } = parseArgs({
   options: {
     "gateway-url": {
       type: "string",
-      default: process.env.GATEWAY_URL ?? "ws://localhost:5000",
+      default: process.env.GATEWAY_URL ?? "ws://localhost:3000",
     },
     "pivot-id": {
       type: "string",

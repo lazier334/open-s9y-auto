@@ -10,6 +10,7 @@ const manualProcessingItems: string[] = [
 // 使用的打包插件列表
 const moduleList = [
   "build-s9y.ts",
+  "build-copy-sdk.ts",
 ];
 
 (async function (mList) {

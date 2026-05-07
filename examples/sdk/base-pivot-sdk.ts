@@ -110,7 +110,7 @@ export abstract class BasePivot {
 
     /**
      * 获取任务进度（统一接口 2/3）
-     * - 消费者直接 GET /pipe?taskId=...&protocol=progress 挂起等待
+     * - 执行者直接 GET /pipe?taskId=...&protocol=progress 挂起等待
      */
     async progress(taskId: string): Promise<ReadableStream<Uint8Array>> {
         const res = await fetch(`${this.getUrl('', '/pipe')}?taskId=${taskId}&protocol=progress`, { headers: this.options.headers || {} });
