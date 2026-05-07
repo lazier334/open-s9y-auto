@@ -3,6 +3,10 @@ import type { Message, PivotType } from "./type.ts";
 
 export interface BasePivotOptions {
     gatewayUrl: string;
+    /** 是否使用ssl */
+    ssl?: boolean;
+    /** 请求头 */
+    headers?: Record<string, string | string[]>;
     pivotId: string;
     type: PivotType;
     /** 支点自定义名称（可用于路由匹配） */
@@ -40,6 +44,32 @@ export abstract class BasePivot {
     }
 
     /**
+     * 获取url
+     * @param mode 模式，标准写法: 'http' | 'https' | 'ws' | 'wss'
+     * @param pathname 路径
+     * @returns 
+     */
+    getUrl(mode: string, pathname?: string) {
+        let baseUrl = this.options.gatewayUrl;
+        // 尝试补全url的协议前缀
+        if (!(['http:', 'https:', 'ws:', 'wss:'].includes(baseUrl.split('//').shift() || ''))) {
+            if (!baseUrl.startsWith('//')) {
+                baseUrl = '//' + baseUrl;
+            }
+            baseUrl = 'http:' + baseUrl;
+        }
+        let url = new URL(baseUrl);
+        mode = mode;
+        if (mode.startsWith('w')) {
+            url.protocol = this.options.ssl || mode.startsWith('wss') ? 'wss:' : 'ws:';
+        } else {
+            url.protocol = this.options.ssl || mode.startsWith('https') ? 'https:' : 'http:';
+        }
+        if (typeof pathname == 'string') url.pathname = pathname;
+        return url.href;
+    }
+
+    /**
      * 建立与网关的连接
      * - WS 模式：建立 WebSocket 并自动注册、启用心跳
      * - HTTP 模式：启动 /register 长轮询循环
@@ -70,9 +100,9 @@ export abstract class BasePivot {
             this.ws.send(JSON.stringify(message));
             return;
         }
-        const res = await fetch(`${this.options.gatewayUrl}/push`, {
+        const res = await fetch(this.getUrl('', '/push'), {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { ...(this.options.headers || {}), "Content-Type": "application/json" },
             body: JSON.stringify(message),
         });
         if (!res.ok) throw new Error(`推送失败: ${res.status}`);
@@ -83,7 +113,7 @@ export abstract class BasePivot {
      * - 消费者直接 GET /pipe?taskId=...&protocol=progress 挂起等待
      */
     async progress(taskId: string): Promise<ReadableStream<Uint8Array>> {
-        const res = await fetch(`${this.options.gatewayUrl}/pipe?taskId=${taskId}&protocol=progress`);
+        const res = await fetch(`${this.getUrl('', '/pipe')}?taskId=${taskId}&protocol=progress`, { headers: this.options.headers || {} });
         if (!res.ok) throw new Error(`获取进度失败: ${res.status}`);
         return res.body as ReadableStream<Uint8Array>;
     }
@@ -92,7 +122,7 @@ export abstract class BasePivot {
      * 获取任务结果（统一接口 3/3）
      */
     async result(taskId: string): Promise<unknown> {
-        const res = await fetch(`${this.options.gatewayUrl}/pipe?taskId=${taskId}&protocol=result`);
+        const res = await fetch(`${this.getUrl('', '/pipe')}?taskId=${taskId}&protocol=result`, { headers: this.options.headers || {} });
         if (!res.ok) throw new Error(`获取结果失败: ${res.status}`);
         const json = (await res.json()) as { data?: unknown; error?: string };
         if (json.error) throw new Error(json.error);
@@ -103,7 +133,7 @@ export abstract class BasePivot {
      * 获取任务状态
      */
     async status(taskId: string): Promise<unknown> {
-        const res = await fetch(`${this.options.gatewayUrl}/pipe?taskId=${taskId}&protocol=status`);
+        const res = await fetch(`${this.getUrl('', '/pipe')}?taskId=${taskId}&protocol=status`, { headers: this.options.headers || {} });
         if (!res.ok) throw new Error(`获取状态失败: ${res.status}`);
         const json = (await res.json()) as { data?: unknown; error?: string };
         if (json.error) throw new Error(json.error);
@@ -115,8 +145,7 @@ export abstract class BasePivot {
     private _connectWs(): Promise<void> {
         console.log('正在使用WS模式注册支点');
         return new Promise((resolve, reject) => {
-            const wsUrl = this.options.gatewayUrl.replace(/^http/, "ws");
-            this.ws = new WebSocket(wsUrl);
+            this.ws = new WebSocket(this.getUrl('ws'), { headers: this.options.headers || {} });
 
             this.ws.once("open", () => {
                 this._sendRegister();
@@ -206,10 +235,9 @@ export abstract class BasePivot {
                         capabilities: this.options.capabilities,
                         priceTable: this.options.priceTable,
                     };
-
-                    const res = await fetch(`${this.options.gatewayUrl}/register`, {
+                    const res = await fetch(`${this.getUrl('', '/register')}`, {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                        headers: { ...(this.options.headers || {}), "Content-Type": "application/json" },
                         body: JSON.stringify(body),
                         signal: this.registerAbort?.signal,
                     });
@@ -294,9 +322,9 @@ export abstract class BasePivot {
     }
 
     private async _postPipe(protocol: string, taskId: string, body: { data?: unknown; error?: string }): Promise<void> {
-        const res = await fetch(`${this.options.gatewayUrl}/pipe?taskId=${taskId}&protocol=${protocol}`, {
+        const res = await fetch(`${this.getUrl('', '/pipe')}?taskId=${taskId}&protocol=${protocol}`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { ...(this.options.headers || {}), "Content-Type": "application/json" },
             body: JSON.stringify(body),
         });
         if (!res.ok) {
@@ -310,10 +338,11 @@ export abstract class BasePivot {
         stream: ReadableStream<Uint8Array>
     ): Promise<void> {
         const res = await fetch(
-            `${this.options.gatewayUrl}/pipe?taskId=${taskId}&protocol=${protocol}`,
+            `${this.getUrl('', '/pipe')}?taskId=${taskId}&protocol=${protocol}`,
             {
                 method: "POST",
                 headers: {
+                    ...(this.options.headers || {}),
                     "Content-Type": "application/octet-stream",
                 },
                 body: stream,
