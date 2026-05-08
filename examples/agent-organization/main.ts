@@ -14,7 +14,7 @@
  *   # 终端 2: 启动本示例
  *   node --experimental-strip-types examples/agent-organization/main.ts
  *   # 终端 3: 提交需求
- *   curl -X POST http://localhost:9000/user -H 'Content-Type: application/json' -d '{"content":"做一个登录页面"}'
+ *   curl -X POST http://localhost:9000/user -H 'Content-Type: application/json' -d '{"content":"做一个登录页面，账号密码直接写死，然后登录完成后需要正常给cookie，并且携带cookie访问首页，没有校验通过的时候无法访问首页，会跳转到登录页"}'
  */
 
 import { createServer } from "node:http";
@@ -56,6 +56,7 @@ class UserProxy extends BasePivot {
 
     constructor(gatewayUrl: string) {
         super({
+            headers: { cookie: 's9y-key=user' },
             gatewayUrl, pivotId: "user-proxy", type: "user",
             name: "用户代理", capabilities: ["user-interface"], useWebSocket: true,
         });
@@ -529,6 +530,7 @@ async function main() {
                 res.writeHead(200);
                 res.end(JSON.stringify(result));
             } catch (err) {
+                console.log('error=>', err)
                 const msg = err instanceof Error ? err.message : String(err);
                 console.error("[Main] 处理失败:", msg);
                 res.writeHead(500);

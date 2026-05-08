@@ -18,6 +18,7 @@ export class BroadcastPivot extends BasePivot {
       gatewayUrl,
       pivotId,
       type: "system",
+      headers: { cookie: 's9y-key=system' },
       name: pivotId,
       capabilities: ["broadcast"],
       useWebSocket: true,
@@ -54,7 +55,7 @@ export class BroadcastPivot extends BasePivot {
         payload: message.payload,
         traceId: message.traceId,
         timestamp: Date.now(),
-      }).catch(() => {});
+      }).catch(() => { });
     }
   }
 }

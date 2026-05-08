@@ -6,6 +6,11 @@
   <title>S9Y Terminal</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css" />
   <style>
+    :root {
+      --green: #22c55e;
+      --blue: #3b82f6;
+      --purple: #a855f7;
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #1e1e1e; height: 100vh; display: flex; flex-direction: column; color: #d4d4d4; }
 
@@ -31,7 +36,11 @@
     .pivot-item.active { background: #094771; }
     .pivot-avatar { width: 28px; height: 28px; border-radius: 50%; background: #0e639c; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; }
     .pivot-info { flex: 1; min-width: 0; }
-    .pivot-name { font-weight: 500; }
+    .pivot-name { font-weight: 500; display: flex; align-items: center; gap: 6px; }
+    .pivot-adapter { font-size: 10px; padding: 1px 5px; border-radius: 3px; background: #3c3c3c; color: #888; font-weight: 400; flex-shrink: 0; }
+    .badge-ws {background: var(--purple);color: #fff;}
+    .badge-http {background: var(--blue);color: #fff;}
+    .badge-fun {background: var(--green);color: #000;}
     .pivot-id { font-size: 11px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .refresh-btn { margin: 6px 10px; padding: 5px; border: 1px solid #3e3e42; border-radius: 4px; background: #2d2d2d; cursor: pointer; font-size: 12px; color: #ccc; }
     .refresh-btn:hover { background: #3c3c3c; }
@@ -273,7 +282,7 @@
         return `<div class="pivot-item${activeClass}" data-pivot-id="${p.pivotId}">
           <div class="pivot-avatar">${initial}</div>
           <div class="pivot-info">
-            <div class="pivot-name">${escHtml(name)}</div>
+            <div class="pivot-name">${p.adapterType ? `<span class="pivot-adapter badge-${p.adapterType ?? 'def'}">${escHtml(p.adapterType)}</span>` : ''}${escHtml(name)}</div>
             <div class="pivot-id">${escHtml(p.pivotId)}</div>
           </div>
         </div>`;

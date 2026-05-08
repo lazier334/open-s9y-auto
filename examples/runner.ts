@@ -20,9 +20,9 @@ interface MenuItem {
 
 const items: MenuItem[] = [
     {
-        name: "agent-organization-simple",
+        name: "terminal-fulcrum",
         cmd: "node",
-        args: ["--env-file=.env", "--experimental-strip-types", "examples/agent-organization-simple/main.ts"],
+        args: ["--env-file=.env", "--experimental-strip-types", "examples/terminal-fulcrum/main.ts"],
         env: {},
     },
     {

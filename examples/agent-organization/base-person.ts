@@ -70,6 +70,7 @@ export class BasePerson extends BasePivot {
       gatewayUrl: options.gatewayUrl,
       pivotId: options.pivotId,
       type: "agent",
+      headers: { cookie: 's9y-key=agent' },
       name: options.name,
       capabilities: [options.name],
       useWebSocket: true,
