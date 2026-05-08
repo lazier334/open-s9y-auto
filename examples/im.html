@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>S9Y IM</title>
+  <style>
+    :root {
+      --green: #22c55e;
+      --blue: #3b82f6;
+      --purple: #a855f7;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; height: 100vh; display: flex; flex-direction: column; }
+
+    /* 顶部配置栏 */
+    .header { background: #fff; border-bottom: 1px solid #ddd; padding: 10px 16px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .header input, .header select { padding: 6px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+    .header input[type="text"] { min-width: 160px; }
+    .header button { padding: 6px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .btn-primary { background: #07c160; color: #fff; }
+    .btn-primary:hover { background: #06ad56; }
+    .btn-danger { background: #fa5151; color: #fff; }
+    .btn-danger:hover { background: #e04b4b; }
+    .btn-secondary { background: #e9e9e9; color: #333; }
+    .status { font-size: 12px; padding: 4px 10px; border-radius: 12px; }
+    .status.online { background: #e6f7ed; color: #07c160; }
+    .status.offline { background: #fff0f0; color: #fa5151; }
+
+    /* 主体 */
+    .main { flex: 1; display: flex; overflow: hidden; }
+
+    /* 左侧联系人 */
+    .sidebar { width: 260px; background: #fff; border-right: 1px solid #ddd; display: flex; flex-direction: column; }
+    .sidebar-top { padding: 12px; border-bottom: 1px solid #eee; }
+    .sidebar-top input { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+    .pivot-list { flex: 1; overflow-y: auto; padding: 8px; }
+    .pivot-item { padding: 10px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 14px; }
+    .pivot-item:hover { background: #f5f5f5; }
+    .pivot-item.active { background: #e6f7ed; }
+    .pivot-avatar { width: 36px; height: 36px; border-radius: 50%; background: #07c160; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; flex-shrink: 0; }
+    .pivot-info { flex: 1; min-width: 0; }
+    .pivot-name { font-weight: 500; color: #333; display: flex; align-items: center; gap: 6px; }
+    .pivot-adapter { font-size: 10px; padding: 1px 5px; border-radius: 3px; background: #e8e8e8; color: #888; font-weight: 400; flex-shrink: 0; }
+    .badge-ws {background: var(--purple);color: #fff;}
+    .badge-http {background: var(--blue);color: #fff;}
+    .badge-fun {background: var(--green);color: #000;}
+    .pivot-type { font-size: 12px; color: #999; }
+    .pivot-cap { font-size: 11px; color: #bbb; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .refresh-btn { margin: 8px 12px; padding: 6px; border: 1px solid #ddd; border-radius: 6px; background: #fff; cursor: pointer; font-size: 12px; color: #666; }
+    .refresh-btn:hover { background: #f5f5f5; }
+
+    /* 右侧聊天区 */
+    .chat { flex: 1; display: flex; flex-direction: column; background: #f5f5f5; }
+    .chat-header { padding: 14px 20px; background: #fff; border-bottom: 1px solid #eee; font-weight: 500; color: #333; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+    .msg { max-width: 70%; padding: 10px 14px; border-radius: 12px; font-size: 14px; line-height: 1.5; word-break: break-word; }
+    .msg.self { align-self: flex-end; background: #95ec69; color: #333; border-bottom-right-radius: 4px; }
+    .msg.other { align-self: flex-start; background: #fff; color: #333; border-bottom-left-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
+    .msg-meta { font-size: 11px; color: #999; margin-top: 4px; }
+    .msg-system { align-self: center; font-size: 12px; color: #999; padding: 4px 12px; background: rgba(0,0,0,0.04); border-radius: 12px; }
+    .msg-body { display: flex; align-items: center; gap: 6px; }
+    .msg-status { font-size: 13px; cursor: default; user-select: none; }
+    .msg-status.pending { color: #ccc; }
+    .msg-status.ok { color: #07c160; }
+    .msg-status.fail { color: #fa5151; }
+
+    .chat-input { padding: 12px 20px; background: #fff; border-top: 1px solid #eee; display: flex; gap: 10px; align-items: flex-end; }
+    .chat-input textarea { flex: 1; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; resize: none; min-height: 44px; max-height: 120px; font-family: inherit; line-height: 1.4; }
+    .chat-input button { padding: 10px 22px; border: none; border-radius: 8px; background: #07c160; color: #fff; font-size: 14px; cursor: pointer; }
+    .chat-input button:hover { background: #06ad56; }
+    .chat-input button:disabled { background: #ccc; cursor: not-allowed; }
+
+    .target-bar { padding: 8px 20px; background: #fafafa; border-top: 1px solid #eee; display: flex; gap: 8px; align-items: center; font-size: 13px; color: #666; }
+    .target-bar select { padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; max-width: 200px; }
+    .target-bar .exact-input { padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; width: 160px; }
+
+    /* 历史会话 */
+    .history-section { border-top: 1px solid #eee; padding: 8px 0; max-height: 200px; overflow-y: auto; }
+    .history-title { padding: 0 12px; font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .history-list { padding: 0 8px; }
+    .history-item { padding: 8px 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #999; }
+    .history-item:hover { background: #f5f5f5; }
+    .history-item.active { background: #e6f7ed; color: #333; }
+    .history-name { display: flex; align-items: center; gap: 8px; }
+    .history-dot { width: 6px; height: 6px; border-radius: 50%; background: #ccc; }
+    .history-delete { opacity: 0; cursor: pointer; padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #999; border: none; background: transparent; }
+    .history-item:hover .history-delete { opacity: 1; }
+    .history-delete:hover { background: #ff4444; color: #fff; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <input id="gatewayUrl" type="text" placeholder="网关地址" value="ws://localhost:3000">
+    <input id="username" type="text" placeholder="用户名" value="">
+    <select id="mode">
+      <option value="ws">WebSocket</option>
+      <option value="http">HTTP 长轮询</option>
+    </select>
+    <button id="connectBtn" class="btn-primary">连接</button>
+    <button id="disconnectBtn" class="btn-danger" style="display:none">断开</button>
+    <span id="status" class="status offline">未连接</span>
+    <button id="clearAllBtn" class="btn-secondary" style="margin-left:auto">清理全部</button>
+  </div>
+
+  <div class="main">
+    <div class="sidebar">
+      <div class="sidebar-top">
+        <input id="searchInput" type="text" placeholder="搜索 pivot（支持模糊）">
+      </div>
+      <button class="refresh-btn" id="refreshBtn">刷新在线列表</button>
+      <div class="pivot-list" id="pivotList"></div>
+      <div class="history-section" id="historySection" style="display:none">
+        <div class="history-title">历史会话</div>
+        <div class="history-list" id="historyList"></div>
+      </div>
+    </div>
+
+    <div class="chat">
+      <div class="chat-header" id="chatHeader">选择一个联系人开始聊天</div>
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="target-bar">
+        <span>发送给:</span>
+        <select id="targetSelect">
+          <option value="">-- 选择在线 pivot --</option>
+        </select>
+        <span>或精确:</span>
+        <input id="targetExact" class="exact-input" type="text" placeholder="输入 pivotId">
+      </div>
+      <div class="chat-input">
+        <textarea id="msgInput" rows="1" placeholder="输入消息，Enter 发送，Shift+Enter 换行"></textarea>
+        <button id="sendBtn" disabled>发送</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // === 配置与缓存 ===
+    const STORAGE_KEY = 's9y_im_config';
+    const MSG_STORAGE_KEY = 's9y_im_messages';
+
+    function loadConfig() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; }
+    }
+    function saveConfig(cfg) { localStorage.setItem(STORAGE_KEY, JSON.stringify(cfg)); }
+    function loadMessages() {
+      try { return JSON.parse(localStorage.getItem(MSG_STORAGE_KEY)) || {}; } catch { return {}; }
+    }
+    function saveMessages(msgs) { localStorage.setItem(MSG_STORAGE_KEY, JSON.stringify(msgs)); }
+
+    const config = loadConfig();
+    const gatewayUrlInput = document.getElementById('gatewayUrl');
+    const usernameInput = document.getElementById('username');
+    const modeSelect = document.getElementById('mode');
+
+    if (config.gatewayUrl) gatewayUrlInput.value = config.gatewayUrl;
+    if (config.username) usernameInput.value = config.username;
+    if (config.mode) modeSelect.value = config.mode;
+
+    // 自动生成用户名
+    if (!usernameInput.value) {
+      usernameInput.value = 'user-' + Math.random().toString(36).slice(2, 8);
+    }
+
+    // === 状态 ===
+    let ws = null;
+    let abortCtrl = null;
+    let heartbeatTimer = null;
+    let connected = false;
+    let myPivotId = '';
+    let currentTarget = '';
+    let allPivots = [];
+    let messageHistory = loadMessages();
+
+    // === DOM ===
+    const connectBtn = document.getElementById('connectBtn');
+    const disconnectBtn = document.getElementById('disconnectBtn');
+    const statusEl = document.getElementById('status');
+    const pivotListEl = document.getElementById('pivotList');
+    const chatHeader = document.getElementById('chatHeader');
+    const chatMessages = document.getElementById('chatMessages');
+    const targetSelect = document.getElementById('targetSelect');
+    const targetExact = document.getElementById('targetExact');
+    const msgInput = document.getElementById('msgInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const searchInput = document.getElementById('searchInput');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const historySection = document.getElementById('historySection');
+    const historyList = document.getElementById('historyList');
+    const clearAllBtn = document.getElementById('clearAllBtn');
+
+    // === 工具函数 ===
+    function getWsUrl(url) { return url.replace(/^http/, 'ws'); }
+    function getHttpUrl(url) { return url.replace(/^ws/, 'http'); }
+    function genId() { return crypto.randomUUID(); }
+    function now() { return Date.now(); }
+    function formatTime(ts) {
+      const d = new Date(ts);
+      return `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}:${d.getSeconds().toString().padStart(2,'0')}`;
+    }
+
+    function setStatus(online, text) {
+      statusEl.className = 'status ' + (online ? 'online' : 'offline');
+      statusEl.textContent = text;
+    }
+
+    // === 消息显示 ===
+    function renderMessages(targetId) {
+      chatMessages.innerHTML = '';
+      const key = [myPivotId, targetId].sort().join('|');
+      const msgs = messageHistory[key] || [];
+      for (const m of msgs) {
+        appendMessageEl(m.from, m.text, m.ts, false);
+      }
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function appendMessageEl(from, text, ts, autoScroll = true, traceId = null) {
+      const div = document.createElement('div');
+      if (from === '_system') {
+        div.className = 'msg-system';
+        div.textContent = text;
+      } else {
+        const isSelf = from === myPivotId;
+        div.className = 'msg ' + (isSelf ? 'self' : 'other');
+        const statusHtml = (isSelf && traceId)
+          ? ` <span class="msg-status pending" data-traceid="${traceId}" title="发送中...">○</span>`
+          : '';
+        div.innerHTML = `
+          <div class="msg-body">${statusHtml}<span class="msg-text">${escapeHtml(text)}</span></div>
+          <div class="msg-meta">${escapeHtml(from)} · ${formatTime(ts)}</div>
+        `;
+      }
+      chatMessages.appendChild(div);
+      if (autoScroll) chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function updateSendStatus(traceId, status, tooltip) {
+      const el = document.querySelector(`.msg-status[data-traceid="${traceId}"]`);
+      if (!el) return;
+      el.className = 'msg-status ' + status;
+      el.title = tooltip;
+      if (status === 'ok') el.textContent = '✓';
+      else if (status === 'fail') el.textContent = '✗';
+    }
+
+    function escapeHtml(s) {
+      const div = document.createElement('div');
+      div.textContent = s;
+      return div.innerHTML;
+    }
+
+    function saveMessage(targetId, from, text, ts) {
+      const key = [myPivotId, targetId].sort().join('|');
+      if (!messageHistory[key]) messageHistory[key] = [];
+      messageHistory[key].push({ from, text, ts });
+      // 最多保留 500 条
+      if (messageHistory[key].length > 500) messageHistory[key] = messageHistory[key].slice(-500);
+      saveMessages(messageHistory);
+    }
+
+    // === 在线列表 ===
+    async function fetchPivots() {
+      if (modeSelect.value === 'ws' && ws && ws.readyState === 1) {
+        try {
+          const data = await wsRequest('pivots', {});
+          allPivots = (data.pivots || []).filter(p => p.pivotId !== myPivotId);
+          renderPivotList();
+          updateTargetSelect();
+        } catch (e) {
+          console.error('获取 pivot 列表失败', e);
+        }
+        return;
+      }
+
+      const url = getHttpUrl(gatewayUrlInput.value);
+      try {
+        const res = await fetch(url + '/pivots');
+        if (!res.ok) return;
+        const data = await res.json();
+        allPivots = (data.pivots || []).filter(p => p.pivotId !== myPivotId);
+        renderPivotList();
+        updateTargetSelect();
+      } catch (e) {
+        console.error('获取 pivot 列表失败', e);
+      }
+    }
+
+    function renderPivotList() {
+      const kw = searchInput.value.trim().toLowerCase();
+      pivotListEl.innerHTML = '';
+
+      const filtered = allPivots.filter(p => {
+        if (!kw) return true;
+        const text = (p.pivotId + ' ' + (p.type || '') + ' ' + (p.capabilities || []).join(' ')).toLowerCase();
+        return text.includes(kw);
+      });
+
+      for (const p of filtered) {
+        const el = document.createElement('div');
+        el.className = 'pivot-item' + (p.pivotId === currentTarget ? ' active' : '');
+        const caps = (p.capabilities || []).join(', ');
+        el.innerHTML = `
+          <div class="pivot-avatar">${p.pivotId.slice(0, 2).toUpperCase()}</div>
+          <div class="pivot-info">
+            <div class="pivot-name">${p.adapterType ? `<span class="pivot-adapter badge-${p.adapterType ?? 'def'}">${escapeHtml(p.adapterType)}</span>` : ''}${escapeHtml(p.name ?? p.pivotId)}</div>
+            <div class="pivot-type">${escapeHtml(p.type || 'other')}</div>
+            ${caps ? `<div class="pivot-cap">${escapeHtml(caps)}</div>` : ''}
+          </div>
+        `;
+        el.onclick = () => {
+          currentTarget = p.pivotId;
+          chatHeader.textContent = '与 ' + p.pivotId + ' 聊天';
+          renderPivotList();
+          renderMessages(currentTarget);
+          targetExact.value = p.pivotId;
+        };
+        pivotListEl.appendChild(el);
+      }
+
+      if (filtered.length === 0) {
+        pivotListEl.innerHTML = '<div style="padding:20px;text-align:center;color:#999;font-size:13px;">无匹配结果</div>';
+      }
+      renderHistoryList();
+    }
+
+    function updateTargetSelect() {
+      const oldVal = targetSelect.value;
+      targetSelect.innerHTML = '<option value="">-- 选择在线 pivot --</option>';
+      for (const p of allPivots) {
+        const opt = document.createElement('option');
+        opt.value = p.pivotId;
+        opt.textContent = p.pivotId + ' (' + (p.type || 'other') + ')';
+        targetSelect.appendChild(opt);
+      }
+      if (oldVal) targetSelect.value = oldVal;
+    }
+
+    // === 历史会话列表 ===
+    function renderHistoryList() {
+      const onlineIds = new Set(allPivots.map(p => p.pivotId));
+      const histories = [];
+      for (const key of Object.keys(messageHistory)) {
+        const ids = key.split('|');
+        const targetId = ids.find(id => id !== myPivotId);
+        if (targetId && !onlineIds.has(targetId) && messageHistory[key]?.length > 0) {
+          histories.push(targetId);
+        }
+      }
+
+      if (histories.length === 0) {
+        historySection.style.display = 'none';
+        return;
+      }
+      historySection.style.display = 'block';
+      historyList.innerHTML = '';
+
+      for (const targetId of histories) {
+        const el = document.createElement('div');
+        el.className = 'history-item' + (targetId === currentTarget ? ' active' : '');
+        el.innerHTML = `
+          <span class="history-name"><span class="history-dot"></span>${escapeHtml(targetId)}</span>
+          <button class="history-delete">删除</button>
+        `;
+        el.onclick = (e) => {
+          if (e.target.classList.contains('history-delete')) return;
+          currentTarget = targetId;
+          chatHeader.textContent = '与 ' + targetId + ' 聊天';
+          renderMessages(currentTarget);
+          targetExact.value = targetId;
+          renderPivotList();
+          renderHistoryList();
+        };
+        el.querySelector('.history-delete').onclick = (e) => {
+          e.stopPropagation();
+          deleteConversation(targetId);
+        };
+        historyList.appendChild(el);
+      }
+    }
+
+    function deleteConversation(targetId) {
+      const key = [myPivotId, targetId].sort().join('|');
+      delete messageHistory[key];
+      saveMessages(messageHistory);
+      if (currentTarget === targetId) {
+        currentTarget = '';
+        chatHeader.textContent = '选择一个联系人开始聊天';
+        chatMessages.innerHTML = '';
+        targetExact.value = '';
+      }
+      renderHistoryList();
+    }
+
+    function clearAllData() {
+      if (!confirm('确定要清理所有配置和对话记录吗？此操作不可恢复。')) return;
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(MSG_STORAGE_KEY);
+      location.reload();
+    }
+
+    searchInput.oninput = renderPivotList;
+    targetSelect.onchange = () => {
+      if (targetSelect.value) {
+        targetExact.value = targetSelect.value;
+        currentTarget = targetSelect.value;
+        chatHeader.textContent = '与 ' + currentTarget + ' 聊天';
+        renderMessages(currentTarget);
+      }
+    };
+    targetExact.oninput = () => { 
+      currentTarget = targetExact.value; 
+      chatHeader.textContent = currentTarget ? '与 ' + currentTarget + ' 聊天' : '选择一个联系人开始聊天';
+      renderMessages(currentTarget);
+    };
+    refreshBtn.onclick = fetchPivots;
+    clearAllBtn.onclick = clearAllData;
+
+    // === 发送确认跟踪 ===
+    let sendConfirmTimers = new Map();  // traceId -> timer
+
+    function clearSendTimer(traceId) {
+      const t = sendConfirmTimers.get(traceId);
+      if (t) { clearTimeout(t); sendConfirmTimers.delete(traceId); }
+    }
+
+    // === 发送消息 ===
+    async function sendMessage() {
+      const text = msgInput.value.trim();
+      if (!text || !connected) return;
+
+      let targetId = targetExact.value.trim();
+      if (!targetId && targetSelect.value) targetId = targetSelect.value;
+      if (!targetId) {
+        appendMessageEl('_system', '请选择一个目标 pivot', now());
+        return;
+      }
+
+      // 如果切换了目标，自动切到新对话
+      if (currentTarget !== targetId) {
+        currentTarget = targetId;
+        chatHeader.textContent = targetId ? '与 ' + targetId + ' 聊天' : '选择一个联系人开始聊天';
+        renderMessages(currentTarget);
+        targetExact.value = targetId;
+      }
+
+      const traceId = genId();
+      const msg = {
+        senderId: myPivotId,
+        targetId: targetId,
+        type: 'push',
+        payload: { data: { content: text } },
+        traceId,
+        timestamp: now(),
+      };
+
+      // 先显示本地气泡（带 pending 状态）
+      appendMessageEl(myPivotId, text, now(), true, traceId);
+      saveMessage(targetId, myPivotId, text, now());
+      msgInput.value = '';
+      msgInput.style.height = 'auto';
+      renderHistoryList();
+
+      if (modeSelect.value === 'ws' && ws && ws.readyState === 1) {
+        // WS 模式：设置发送确认超时
+        const timer = setTimeout(() => {
+          updateSendStatus(traceId, 'fail', '✗ 发送超时，对方可能不在线');
+          sendConfirmTimers.delete(traceId);
+        }, 5000);
+        sendConfirmTimers.set(traceId, timer);
+        ws.send(JSON.stringify(msg));
+      } else {
+        const url = getHttpUrl(gatewayUrlInput.value);
+        try {
+          const res = await fetch(url + '/push', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(msg),
+          });
+          const result = await res.json();
+          if (res.ok && result.status === 'accepted') {
+            updateSendStatus(traceId, 'ok', '✓ 已发送到对方');
+          } else {
+            updateSendStatus(traceId, 'fail', '✗ ' + (result.error || res.statusText || '发送失败'));
+          }
+        } catch (e) {
+          updateSendStatus(traceId, 'fail', '✗ ' + e.message);
+        }
+      }
+    }
+
+    sendBtn.onclick = sendMessage;
+    msgInput.onkeydown = (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    };
+    msgInput.oninput = () => {
+      msgInput.style.height = 'auto';
+      msgInput.style.height = msgInput.scrollHeight + 'px';
+    };
+
+    // === 接收消息 ===
+    function onReceiveMessage(msg) {
+      if (!msg || msg.senderId === myPivotId) return;
+      const text = typeof msg.payload?.data === 'string' ? msg.payload.data : (msg.payload?.data?.content || JSON.stringify(msg.payload?.data));
+      const from = msg.senderId;
+      appendMessageEl(from, text, msg.timestamp || now());
+      saveMessage(from, from, text, msg.timestamp || now());
+
+      // 如果当前没选目标，自动切换到发件人
+      if (!currentTarget) {
+        currentTarget = from;
+        targetExact.value = from;
+        chatHeader.textContent = '与 ' + from + ' 聊天';
+        renderMessages(currentTarget);
+      }
+      renderHistoryList();
+    }
+
+    // === WS 请求-响应匹配 ===
+    let wsPending = new Map();
+
+    function wsRequest(type, payload) {
+      return new Promise((resolve, reject) => {
+        if (!ws || ws.readyState !== 1) { reject(new Error('WS 未连接')); return; }
+        const traceId = genId();
+        const timer = setTimeout(() => {
+          if (wsPending.has(traceId)) { wsPending.delete(traceId); reject(new Error('请求超时')); }
+        }, 5000);
+        wsPending.set(traceId, { resolve, reject, timer });
+        ws.send(JSON.stringify({ senderId: myPivotId, type, payload, traceId, timestamp: now() }));
+      });
+    }
+
+    // === WebSocket 模式 ===
+    function connectWs() {
+      const url = getWsUrl(gatewayUrlInput.value);
+      myPivotId = usernameInput.value.trim() || 'user-' + Math.random().toString(36).slice(2, 8);
+      ws = new WebSocket(url);
+
+      ws.onopen = () => {
+        connected = true;
+        updateUI();
+        setStatus(true, '已连接 (WS)');
+        appendMessageEl('_system', '已连接，pivotId: ' + myPivotId, now());
+
+        // 注册
+        ws.send(JSON.stringify({
+          senderId: myPivotId,
+          type: 'register',
+          payload: { pivotId: myPivotId, type: 'user', name: myPivotId, capabilities: ['chat'] },
+          traceId: genId(),
+          timestamp: now(),
+        }));
+        // 心跳
+        heartbeatTimer = setInterval(() => {
+          if (ws.readyState === 1) {
+            ws.send(JSON.stringify({ senderId: myPivotId, type: 'heartbeat', payload: {}, traceId: genId(), timestamp: now() }));
+          }
+        }, 30000);
+      };
+
+      ws.onmessage = (e) => {
+        try {
+          const msg = JSON.parse(e.data);
+
+          // ① 优先匹配 pending request（按 traceId）
+          const pending = wsPending.get(msg.traceId);
+          if (pending) {
+            clearTimeout(pending.timer);
+            wsPending.delete(msg.traceId);
+            pending.resolve(msg.payload?.data ?? msg.payload);
+            return;
+          }
+
+          // ② 发送确认 / 错误响应（来自网关）
+          if (msg.senderId === 'gateway' && msg.type === 'push') {
+            clearSendTimer(msg.traceId);
+            if (msg.payload?.error) {
+              updateSendStatus(msg.traceId, 'fail', '✗ ' + msg.payload.error);
+            } else {
+              const data = msg.payload?.data;
+              if (data?.status === 'accepted') {
+                updateSendStatus(msg.traceId, 'ok', '✓ 已发送到对方');
+              }
+            }
+            return;
+          }
+
+          // ③ 业务消息
+          if (msg.type === 'push') onReceiveMessage(msg);
+        } catch {}
+      };
+
+      ws.onclose = () => { wsPending.clear(); onDisconnected(); };
+      ws.onerror = () => { wsPending.clear(); onDisconnected(); };
+    }
+
+    // === HTTP 长轮询模式 ===
+    async function connectHttp() {
+      const baseUrl = getHttpUrl(gatewayUrlInput.value);
+      myPivotId = usernameInput.value.trim() || 'user-' + Math.random().toString(36).slice(2, 8);
+      abortCtrl = new AbortController();
+      connected = true;
+      updateUI();
+      setStatus(true, '已连接 (HTTP)');
+      appendMessageEl('_system', '已连接，pivotId: ' + myPivotId, now());
+
+      // 轮询注册
+      while (connected && !abortCtrl.signal.aborted) {
+        try {
+          const res = await fetch(baseUrl + '/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pivotId: myPivotId, type: 'user', name: myPivotId, capabilities: ['chat'] }),
+            signal: abortCtrl.signal,
+          });
+          if (!res.ok) { await delay(3000); continue; }
+          const text = await res.text();
+          if (!text.trim()) continue;
+          let msg;
+          try { msg = JSON.parse(text); } catch { continue; }
+          if (msg.type === 'noop') continue;
+          if (msg.type === 'push') onReceiveMessage(msg);
+        } catch (e) {
+          if (e.name === 'AbortError') break;
+          await delay(3000);
+        }
+      }
+    }
+
+    function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    // === 连接/断开 ===
+    function connect() {
+      saveConfig({ gatewayUrl: gatewayUrlInput.value, username: usernameInput.value, mode: modeSelect.value });
+      if (modeSelect.value === 'ws') {
+        connectWs();
+      } else {
+        connectHttp();
+      }
+    }
+
+    function disconnect() {
+      connected = false;
+      if (ws) { ws.close(); ws = null; }
+      if (abortCtrl) { abortCtrl.abort(); abortCtrl = null; }
+      if (heartbeatTimer) { clearInterval(heartbeatTimer); heartbeatTimer = null; }
+      onDisconnected();
+    }
+
+    function onDisconnected() {
+      connected = false;
+      updateUI();
+      setStatus(false, '未连接');
+      ws = null;
+    }
+
+    function updateUI() {
+      connectBtn.style.display = connected ? 'none' : 'inline-block';
+      disconnectBtn.style.display = connected ? 'inline-block' : 'none';
+      gatewayUrlInput.disabled = connected;
+      usernameInput.disabled = connected;
+      modeSelect.disabled = connected;
+      sendBtn.disabled = !connected;
+      renderHistoryList();
+      if (connected) fetchPivots();
+    }
+
+    connectBtn.onclick = connect;
+    disconnectBtn.onclick = disconnect;
+
+    // 页面加载后自动连接（如果之前有配置）
+    if (config.gatewayUrl && config.username) {
+      // 不自动连接，等用户点击
+    }
+  </script>
+</body>
+</html>
