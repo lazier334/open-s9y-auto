@@ -3,7 +3,7 @@ import { SessionManager } from "./session-manager.ts";
 import type { TerminalPayload } from "./types.ts";
 import type { Message } from "../sdk/type.ts";
 
-export class TerminalFulcrumPivot extends BasePivot {
+export class TerminalPivot extends BasePivot {
   private sessionManager: SessionManager;
 
   constructor(options: BasePivotOptions) {

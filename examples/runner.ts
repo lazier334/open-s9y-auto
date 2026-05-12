@@ -20,9 +20,9 @@ interface MenuItem {
 
 const items: MenuItem[] = [
     {
-        name: "terminal-fulcrum",
+        name: "terminal-pivot",
         cmd: "node",
-        args: ["--env-file=.env", "--experimental-strip-types", "examples/terminal-fulcrum/main.ts"],
+        args: ["--env-file=.env", "--experimental-strip-types", "examples/terminal-pivot/main.ts"],
         env: {},
     },
     {
@@ -86,7 +86,7 @@ rl.question("\n请输入编号: ", (answer) => {
         console.log(`[Runner] 启动 ${item.name}${item.env ? ` (env: ${JSON.stringify(item.env)})` : ""}`);
 
         const child = spawn(item.cmd, item.args ?? [], {
-            stdio: "inherit",
+            stdio: ["ignore", "inherit", "inherit"],
             env,
         });
 

@@ -98,9 +98,9 @@
     let myPivotId = '';
     let heartbeatTimer = null;
     let allPivots = [];
-    let tabs = new Map();       // sessionId -> { sessionId, fulcrumId, term, fitAddon, container }
+    let tabs = new Map();       // sessionId -> { sessionId, pivotId, term, fitAddon, container }
     let activeTabId = null;
-    let selectedFulcrumId = null;
+    let selectedPivotId = null;
     let resizeThrottle = new Map(); // sessionId -> timer
 
     function genId() { return crypto.randomUUID(); }
@@ -250,7 +250,7 @@
       }
       tabs.clear();
       activeTabId = null;
-      selectedFulcrumId = null;
+      selectedPivotId = null;
       tabAddBtn.disabled = true;
       placeholder.style.display = '';
       hintEl.textContent = '选择一个终端支点开始';
@@ -278,7 +278,7 @@
       pivotListEl.innerHTML = terminals.map(p => {
         const name = p.name || p.pivotId;
         const initial = (name[0] || 'T').toUpperCase();
-        const activeClass = selectedFulcrumId === p.pivotId ? ' active' : '';
+        const activeClass = selectedPivotId === p.pivotId ? ' active' : '';
         return `<div class="pivot-item${activeClass}" data-pivot-id="${p.pivotId}">
           <div class="pivot-avatar">${initial}</div>
           <div class="pivot-info">
@@ -291,10 +291,10 @@
       // click handlers
       pivotListEl.querySelectorAll('.pivot-item').forEach(el => {
         el.addEventListener('click', () => {
-          selectedFulcrumId = el.dataset.pivotId;
+          selectedPivotId = el.dataset.pivotId;
           renderPivotList();
           tabAddBtn.disabled = false;
-          hintEl.textContent = '已选择: ' + selectedFulcrumId + '，点击 + 创建终端';
+          hintEl.textContent = '已选择: ' + selectedPivotId + '，点击 + 创建终端';
         });
       });
     }
@@ -319,7 +319,7 @@
     }
 
     function createTab() {
-      if (!selectedFulcrumId || !connected) return;
+      if (!selectedPivotId || !connected) return;
 
       const sessionId = 'term-' + Math.random().toString(36).slice(2, 8);
       const container = document.createElement('div');
@@ -339,12 +339,12 @@
       term.open(container);
       fitAddon.fit();
 
-      // input: xterm -> WS -> fulcrum
+      // input: xterm -> WS -> pivot
       term.onData((data) => {
         if (!ws || ws.readyState !== 1) return;
         ws.send(JSON.stringify({
           senderId: myPivotId,
-          targetId: selectedFulcrumId,
+          targetId: selectedPivotId,
           type: 'push',
           payload: { data: { type: 'terminal:input', sessionId, data } },
           traceId: genId(),
@@ -352,7 +352,7 @@
         }));
       });
 
-      // resize: xterm -> WS -> fulcrum (throttled 200ms)
+      // resize: xterm -> WS -> pivot (throttled 200ms)
       term.onResize(({ cols, rows }) => {
         const existing = resizeThrottle.get(sessionId);
         if (existing) clearTimeout(existing);
@@ -361,7 +361,7 @@
           if (!ws || ws.readyState !== 1) return;
           ws.send(JSON.stringify({
             senderId: myPivotId,
-            targetId: selectedFulcrumId,
+            targetId: selectedPivotId,
             type: 'push',
             payload: { data: { type: 'terminal:resize', sessionId, cols, rows } },
             traceId: genId(),
@@ -370,14 +370,14 @@
         }, 200));
       });
 
-      tabs.set(sessionId, { sessionId, fulcrumId: selectedFulcrumId, term, fitAddon, container });
+      tabs.set(sessionId, { sessionId, pivotId: selectedPivotId, term, fitAddon, container });
       switchTab(sessionId);
       renderTabBar();
 
-      // create PTY on fulcrum
+      // create PTY on pivot
       ws.send(JSON.stringify({
         senderId: myPivotId,
-        targetId: selectedFulcrumId,
+        targetId: selectedPivotId,
         type: 'push',
         payload: { data: { type: 'terminal:create', sessionId, cols: term.cols, rows: term.rows } },
         traceId: genId(),
@@ -405,11 +405,11 @@
       const tab = tabs.get(sessionId);
       if (!tab) return;
 
-      // tell fulcrum
+      // tell pivot
       if (ws && ws.readyState === 1) {
         ws.send(JSON.stringify({
           senderId: myPivotId,
-          targetId: tab.fulcrumId,
+          targetId: tab.pivotId,
           type: 'push',
           payload: { data: { type: 'terminal:close', sessionId } },
           traceId: genId(),

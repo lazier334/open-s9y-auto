@@ -1,7 +1,7 @@
 import { parseArgs } from "node:util";
 import { randomUUID } from "node:crypto";
 import * as os from "node:os";
-import { TerminalFulcrumPivot } from "./terminal-fulcrum-pivot.ts";
+import { TerminalPivot } from "./terminal-pivot.ts";
 
 const { values } = parseArgs({
   options: {
@@ -20,20 +20,20 @@ const { values } = parseArgs({
   },
 });
 
-const fulcrum = new TerminalFulcrumPivot({
+const pivot = new TerminalPivot({
   gatewayUrl: values["gateway-url"]!,
   pivotId: values["pivot-id"]!,
   name: values.name,
 });
 
-await fulcrum.connect();
+await pivot.connect();
 console.log(
-  `[TerminalFulcrum] pivotId=${fulcrum.options.pivotId} name=${fulcrum.options.name} gateway=${values["gateway-url"]}`,
+  `[TerminalPivot] pivotId=${pivot.options.pivotId} name=${pivot.options.name} gateway=${values["gateway-url"]}`,
 );
 
 const shutdown = () => {
-  console.log("\n[TerminalFulcrum] shutting down...");
-  fulcrum.dispose();
+  console.log("\n[TerminalPivot] shutting down...");
+  pivot.dispose();
   process.exit(0);
 };
 

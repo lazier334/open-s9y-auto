@@ -40,7 +40,7 @@ export class TerminalSession {
     this.shell = shell ?? TerminalSession.defaultShell();
     this.pty = this._spawn(this.shell, size.cols, size.rows, cwd ?? process.cwd());
 
-    console.log(`[TerminalFulcrum] create TerminalSession ${sessionId} by ${this.ownerId}`);
+    console.log(`[TerminalPivot] create TerminalSession ${sessionId} by ${this.ownerId}`);
     this.pty.onData((data: string) => {
       this.outputBuffer += data;
       if (!this.outputTimer) {
@@ -62,7 +62,7 @@ export class TerminalSession {
         }
         this.outputTimer = null;
       }
-      console.log(`[TerminalFulcrum] onExit TerminalSession ${sessionId} by ${this.ownerId}`);
+      console.log(`[TerminalPivot] onExit TerminalSession ${sessionId} by ${this.ownerId}`);
       this.callbacks.onExit(exitCode);
     });
   }
