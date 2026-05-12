@@ -18,7 +18,7 @@ export class SessionManager {
     this.maxSessions = maxSessions ?? 20;
   }
 
-  create(sessionId: string, ownerId: string, cols: number, rows: number): TerminalSession {
+  create(sessionId: string, ownerId: string, cols: number, rows: number, cwd?: string): TerminalSession {
     if (this.sessions.size >= this.maxSessions) {
       throw new Error(`Max sessions reached (${this.maxSessions})`);
     }
@@ -36,7 +36,7 @@ export class SessionManager {
       },
     };
 
-    const session = new TerminalSession(sessionId, ownerId, callbacks, { cols, rows });
+    const session = new TerminalSession(sessionId, ownerId, callbacks, { cols, rows }, undefined, cwd);
     this.sessions.set(sessionId, session);
     return session;
   }

@@ -31,7 +31,7 @@ export class TerminalFulcrumPivot extends BasePivot {
         const cols = data.cols ?? 80;
         const rows = data.rows ?? 24;
         try {
-          this.sessionManager.create(sessionId, senderId, cols, rows);
+          this.sessionManager.create(sessionId, senderId, cols, rows, data.cwd);
           return { type: "terminal:created", sessionId };
         } catch (err) {
           return {

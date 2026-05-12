@@ -31,6 +31,12 @@ const items: MenuItem[] = [
         args: ["--env-file=.env", "--experimental-strip-types", "examples/agent-organization/main.ts"],
         env: {},
     },
+    {
+        name: "agent-pivot",
+        cmd: "node",
+        args: ["--env-file=.env", "--experimental-strip-types", "examples/agent-pivot/main.ts"],
+        env: {},
+    },
 ];
 
 if (items.length === 0) {

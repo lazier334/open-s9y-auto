@@ -15,6 +15,7 @@ export interface TerminalPayload {
   data?: string;
   cols?: number;
   rows?: number;
+  cwd?: string;
   error?: string;
   sessions?: SessionInfo[];
 }

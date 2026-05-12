@@ -4,6 +4,7 @@ build
 .other
 examples
 projects
+agent-workspaces
 
 # Logs
 logs
