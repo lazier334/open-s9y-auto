@@ -1,0 +1,13 @@
+{
+  "GATEWAY_PORT": 3000,
+  "API_SHUTDOWN": true,
+  "API_ADMIN": true,
+  "API_CONFIG": true,
+  "GATEWAY_LOG_PATH": "logs/gateway.log",
+  "GATEWAY_CMD": "npm run gateway",
+  "AUDIT_KEY_NAME": "s9y-key",
+  "AUDIT_AUTH_KEYS": "user,agent,system,gateway,tool,other",
+  "BROKER_DEFAULT_TIMEOUT": 30000,
+  "BROKER_MAX_RETRIES": 3,
+  "BROKER_RESULT_TTL": 36000000
+}

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,85 +11,456 @@
       --blue: #3b82f6;
       --purple: #a855f7;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; height: 100vh; display: flex; flex-direction: column; }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f0f2f5;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
     /* 顶部配置栏 */
-    .header { background: #fff; border-bottom: 1px solid #ddd; padding: 10px 16px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-    .header input, .header select { padding: 6px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
-    .header input[type="text"] { min-width: 160px; }
-    .header button { padding: 6px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
-    .btn-primary { background: #07c160; color: #fff; }
-    .btn-primary:hover { background: #06ad56; }
-    .btn-danger { background: #fa5151; color: #fff; }
-    .btn-danger:hover { background: #e04b4b; }
-    .btn-secondary { background: #e9e9e9; color: #333; }
-    .status { font-size: 12px; padding: 4px 10px; border-radius: 12px; }
-    .status.online { background: #e6f7ed; color: #07c160; }
-    .status.offline { background: #fff0f0; color: #fa5151; }
+    .header {
+      background: #fff;
+      border-bottom: 1px solid #ddd;
+      padding: 10px 16px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .header input,
+    .header select {
+      padding: 6px 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .header input[type="text"] {
+      min-width: 160px;
+    }
+
+    .header button {
+      padding: 6px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn-primary {
+      background: #07c160;
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #06ad56;
+    }
+
+    .btn-danger {
+      background: #fa5151;
+      color: #fff;
+    }
+
+    .btn-danger:hover {
+      background: #e04b4b;
+    }
+
+    .btn-secondary {
+      background: #e9e9e9;
+      color: #333;
+    }
+
+    .status {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 12px;
+    }
+
+    .status.online {
+      background: #e6f7ed;
+      color: #07c160;
+    }
+
+    .status.offline {
+      background: #fff0f0;
+      color: #fa5151;
+    }
 
     /* 主体 */
-    .main { flex: 1; display: flex; overflow: hidden; }
+    .main {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
 
     /* 左侧联系人 */
-    .sidebar { width: 260px; background: #fff; border-right: 1px solid #ddd; display: flex; flex-direction: column; }
-    .sidebar-top { padding: 12px; border-bottom: 1px solid #eee; }
-    .sidebar-top input { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
-    .pivot-list { flex: 1; overflow-y: auto; padding: 8px; }
-    .pivot-item { padding: 10px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 14px; }
-    .pivot-item:hover { background: #f5f5f5; }
-    .pivot-item.active { background: #e6f7ed; }
-    .pivot-avatar { width: 36px; height: 36px; border-radius: 50%; background: #07c160; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; flex-shrink: 0; }
-    .pivot-info { flex: 1; min-width: 0; }
-    .pivot-name { font-weight: 500; color: #333; display: flex; align-items: center; gap: 6px; }
-    .pivot-adapter { font-size: 10px; padding: 1px 5px; border-radius: 3px; background: #e8e8e8; color: #888; font-weight: 400; flex-shrink: 0; }
-    .badge-ws {background: var(--purple);color: #fff;}
-    .badge-http {background: var(--blue);color: #fff;}
-    .badge-fun {background: var(--green);color: #000;}
-    .pivot-type { font-size: 12px; color: #999; }
-    .pivot-cap { font-size: 11px; color: #bbb; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .refresh-btn { margin: 8px 12px; padding: 6px; border: 1px solid #ddd; border-radius: 6px; background: #fff; cursor: pointer; font-size: 12px; color: #666; }
-    .refresh-btn:hover { background: #f5f5f5; }
+    .sidebar {
+      width: 260px;
+      background: #fff;
+      border-right: 1px solid #ddd;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-top {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .sidebar-top input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .pivot-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
+
+    .pivot-item {
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+    }
+
+    .pivot-item:hover {
+      background: #f5f5f5;
+    }
+
+    .pivot-item.active {
+      background: #e6f7ed;
+    }
+
+    .pivot-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #07c160;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .pivot-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .pivot-name {
+      font-weight: 500;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pivot-adapter {
+      font-size: 10px;
+      padding: 1px 5px;
+      border-radius: 3px;
+      background: #e8e8e8;
+      color: #888;
+      font-weight: 400;
+      flex-shrink: 0;
+    }
+
+    .badge-ws {
+      background: var(--purple);
+      color: #fff;
+    }
+
+    .badge-http {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .badge-fun {
+      background: var(--green);
+      color: #000;
+    }
+
+    .pivot-type {
+      font-size: 12px;
+      color: #999;
+    }
+
+    .pivot-cap {
+      font-size: 11px;
+      color: #bbb;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .refresh-btn {
+      margin: 8px 12px;
+      padding: 6px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      color: #666;
+    }
+
+    .refresh-btn:hover {
+      background: #f5f5f5;
+    }
 
     /* 右侧聊天区 */
-    .chat { flex: 1; display: flex; flex-direction: column; background: #f5f5f5; }
-    .chat-header { padding: 14px 20px; background: #fff; border-bottom: 1px solid #eee; font-weight: 500; color: #333; }
-    .chat-messages { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
-    .msg { max-width: 70%; padding: 10px 14px; border-radius: 12px; font-size: 14px; line-height: 1.5; word-break: break-word; }
-    .msg.self { align-self: flex-end; background: #95ec69; color: #333; border-bottom-right-radius: 4px; }
-    .msg.other { align-self: flex-start; background: #fff; color: #333; border-bottom-left-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
-    .msg-meta { font-size: 11px; color: #999; margin-top: 4px; }
-    .msg-system { align-self: center; font-size: 12px; color: #999; padding: 4px 12px; background: rgba(0,0,0,0.04); border-radius: 12px; }
-    .msg-body { display: flex; align-items: center; gap: 6px; }
-    .msg-status { font-size: 13px; cursor: default; user-select: none; }
-    .msg-status.pending { color: #ccc; }
-    .msg-status.ok { color: #07c160; }
-    .msg-status.fail { color: #fa5151; }
+    .chat {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #f5f5f5;
+    }
 
-    .chat-input { padding: 12px 20px; background: #fff; border-top: 1px solid #eee; display: flex; gap: 10px; align-items: flex-end; }
-    .chat-input textarea { flex: 1; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; resize: none; min-height: 44px; max-height: 120px; font-family: inherit; line-height: 1.4; }
-    .chat-input button { padding: 10px 22px; border: none; border-radius: 8px; background: #07c160; color: #fff; font-size: 14px; cursor: pointer; }
-    .chat-input button:hover { background: #06ad56; }
-    .chat-input button:disabled { background: #ccc; cursor: not-allowed; }
+    .chat-header {
+      padding: 14px 20px;
+      background: #fff;
+      border-bottom: 1px solid #eee;
+      font-weight: 500;
+      color: #333;
+    }
 
-    .target-bar { padding: 8px 20px; background: #fafafa; border-top: 1px solid #eee; display: flex; gap: 8px; align-items: center; font-size: 13px; color: #666; }
-    .target-bar select { padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; max-width: 200px; }
-    .target-bar .exact-input { padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; width: 160px; }
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .msg {
+      max-width: 70%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .msg.self {
+      align-self: flex-end;
+      background: #95ec69;
+      color: #333;
+      border-bottom-right-radius: 4px;
+    }
+
+    .msg.other {
+      align-self: flex-start;
+      background: #fff;
+      color: #333;
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    }
+
+    .msg-meta {
+      font-size: 11px;
+      color: #999;
+      margin-top: 4px;
+    }
+
+    .msg-system {
+      align-self: center;
+      font-size: 12px;
+      color: #999;
+      padding: 4px 12px;
+      background: rgba(0, 0, 0, 0.04);
+      border-radius: 12px;
+    }
+
+    .msg-body {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .msg-status {
+      font-size: 13px;
+      cursor: default;
+      user-select: none;
+    }
+
+    .msg-status.pending {
+      color: #ccc;
+    }
+
+    .msg-status.ok {
+      color: #07c160;
+    }
+
+    .msg-status.fail {
+      color: #fa5151;
+    }
+
+    .chat-input {
+      padding: 12px 20px;
+      background: #fff;
+      border-top: 1px solid #eee;
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    .chat-input textarea {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      resize: none;
+      min-height: 44px;
+      max-height: 120px;
+      font-family: inherit;
+      line-height: 1.4;
+    }
+
+    .chat-input button {
+      padding: 10px 22px;
+      border: none;
+      border-radius: 8px;
+      background: #07c160;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .chat-input button:hover {
+      background: #06ad56;
+    }
+
+    .chat-input button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .target-bar {
+      padding: 8px 20px;
+      background: #fafafa;
+      border-top: 1px solid #eee;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .target-bar select {
+      padding: 4px 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 13px;
+      max-width: 200px;
+    }
+
+    .target-bar .exact-input {
+      padding: 4px 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 13px;
+      width: 160px;
+    }
 
     /* 历史会话 */
-    .history-section { border-top: 1px solid #eee; padding: 8px 0; max-height: 200px; overflow-y: auto; }
-    .history-title { padding: 0 12px; font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-    .history-list { padding: 0 8px; }
-    .history-item { padding: 8px 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #999; }
-    .history-item:hover { background: #f5f5f5; }
-    .history-item.active { background: #e6f7ed; color: #333; }
-    .history-name { display: flex; align-items: center; gap: 8px; }
-    .history-dot { width: 6px; height: 6px; border-radius: 50%; background: #ccc; }
-    .history-delete { opacity: 0; cursor: pointer; padding: 2px 6px; border-radius: 4px; font-size: 12px; color: #999; border: none; background: transparent; }
-    .history-item:hover .history-delete { opacity: 1; }
-    .history-delete:hover { background: #ff4444; color: #fff; }
+    .history-section {
+      border-top: 1px solid #eee;
+      padding: 8px 0;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .history-title {
+      padding: 0 12px;
+      font-size: 11px;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .history-list {
+      padding: 0 8px;
+    }
+
+    .history-item {
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #999;
+    }
+
+    .history-item:hover {
+      background: #f5f5f5;
+    }
+
+    .history-item.active {
+      background: #e6f7ed;
+      color: #333;
+    }
+
+    .history-name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .history-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #ccc;
+    }
+
+    .history-delete {
+      opacity: 0;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #999;
+      border: none;
+      background: transparent;
+    }
+
+    .history-item:hover .history-delete {
+      opacity: 1;
+    }
+
+    .history-delete:hover {
+      background: #ff4444;
+      color: #fff;
+    }
   </style>
 </head>
+
 <body>
   <div class="header">
     <input id="gatewayUrl" type="text" placeholder="网关地址" value="ws://localhost:3000">
@@ -196,7 +568,7 @@
     function now() { return Date.now(); }
     function formatTime(ts) {
       const d = new Date(ts);
-      return `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}:${d.getSeconds().toString().padStart(2,'0')}`;
+      return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}:${d.getSeconds().toString().padStart(2, '0')}`;
     }
 
     function setStatus(online, text) {
@@ -408,8 +780,8 @@
         renderMessages(currentTarget);
       }
     };
-    targetExact.oninput = () => { 
-      currentTarget = targetExact.value; 
+    targetExact.oninput = () => {
+      currentTarget = targetExact.value;
       chatHeader.textContent = currentTarget ? '与 ' + currentTarget + ' 聊天' : '选择一个联系人开始聊天';
       renderMessages(currentTarget);
     };
@@ -588,7 +960,7 @@
 
           // ③ 业务消息
           if (msg.type === 'push') onReceiveMessage(msg);
-        } catch {}
+        } catch { }
       };
 
       ws.onclose = () => { wsPending.clear(); onDisconnected(); };
@@ -675,4 +1047,5 @@
     }
   </script>
 </body>
+
 </html>

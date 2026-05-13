@@ -11,6 +11,6 @@ export default async function main(BUILD_DIR: string) {
   if (!fs.statSync(S9Y_SDK_DIR).isDirectory()) console.log("sdk 不是一个文件夹", S9Y_SDK_DIR);
   fs.cpSync(S9Y_SDK_DIR, TARGET_DIR, { recursive: true, overwrite: true });
 
-  console.log("复制完成。文件路径:", S9Y_SDK_DIR);
-  return `open-s9y 的 sdk 已复制到 ${S9Y_SDK_DIR}`
+  console.log("复制完成。文件路径:", TARGET_DIR);
+  return `open-s9y 的 sdk 已复制到 ${TARGET_DIR}`
 }

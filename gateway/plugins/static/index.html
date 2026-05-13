@@ -777,8 +777,8 @@
     async function refresh() {
       try {
         const [statusRes, configRes] = await Promise.all([
-          fetch('admin/api/status'),
-          fetch('admin/api/config'),
+          fetch('/api/status'),
+          fetch('/api/config'),
         ]);
         const data = await statusRes.json();
         pivotsData = data.pivots || [];
@@ -955,7 +955,7 @@
         for (let i = 0; i < 30; i++) {
           await new Promise(r => setTimeout(r, 1000));
           try {
-            const res = await fetch('admin/api/config');
+            const res = await fetch('/api/config');
             if (res.ok) { location.reload(); return; }
           } catch { }
         }
@@ -968,7 +968,7 @@
 
     async function loadConfig() {
       try {
-        const res = await fetch('admin/api/config');
+        const res = await fetch('/api/config');
         if (!res.ok) throw new Error('HTTP ' + res.status);
         configData = await res.json();
         applyConfigFlags();
@@ -1015,7 +1015,7 @@
         }
       }
       try {
-        const res = await fetch('admin/api/config', {
+        const res = await fetch('/api/config', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
@@ -1080,7 +1080,7 @@
     // 启动时检查配置并应用功能开关
     async function init() {
       try {
-        const res = await fetch('admin/api/config');
+        const res = await fetch('/api/config');
         if (res.ok) {
           configData = await res.json();
           applyConfigFlags();

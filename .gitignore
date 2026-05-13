@@ -5,7 +5,8 @@ build
 examples
 projects
 agent-workspaces
-src
+gateway/src
+gateway/sdk
 
 # Logs
 logs
