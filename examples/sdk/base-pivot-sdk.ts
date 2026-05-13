@@ -100,7 +100,7 @@ export abstract class BasePivot {
             this.ws.send(JSON.stringify(message));
             return;
         }
-        const res = await fetch(this.getUrl('', '/push'), {
+        const res = await fetch(this.getUrl('', '/s9y'), {
             method: "POST",
             headers: { ...(this.options.headers || {}), "Content-Type": "application/json" },
             body: JSON.stringify(message),
@@ -229,16 +229,15 @@ export abstract class BasePivot {
             while (true) {
                 if (this.registerAbort?.signal.aborted) break;
                 try {
-                    const body = {
-                        pivotId: this.options.pivotId,
-                        type: this.options.type,
-                        capabilities: this.options.capabilities,
-                        priceTable: this.options.priceTable,
-                    };
-                    const res = await fetch(`${this.getUrl('', '/register')}`, {
-                        method: "POST",
-                        headers: { ...(this.options.headers || {}), "Content-Type": "application/json" },
-                        body: JSON.stringify(body),
+                    const params = new URLSearchParams();
+                    params.set('pivotId', this.options.pivotId);
+                    if (this.options.name) params.set('name', this.options.name);
+                    if (this.options.type) params.set('type', this.options.type);
+                    if (this.options.capabilities?.length) params.set('capabilities', this.options.capabilities.join(','));
+                    if (this.options.priceTable) params.set('priceTable', this.options.priceTable);
+                    const res = await fetch(`${this.getUrl('', '/s9y')}?${params.toString()}`, {
+                        method: "GET",
+                        headers: { ...(this.options.headers || {}) },
                         signal: this.registerAbort?.signal,
                     });
 

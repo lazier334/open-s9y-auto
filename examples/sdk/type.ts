@@ -24,6 +24,8 @@ export interface MessagePayload {
     sync?: boolean;
     /** 查询时仅查看不消费缓存 */
     peek?: boolean;
+    // 允许任意其他属性
+    [key: string]: unknown;
 }
 
 export interface Message {
@@ -57,14 +59,6 @@ export interface Status {
     connectedAt: number;
     lastHeartbeatAt: number;
     load?: number;
-}
-
-/**
- * /pivots 接口的 Query 参数类型
- */
-export interface PivotsQuery {
-    /** 按能力标签筛选（AND 逻辑，逗号分隔），缺省返回全部 */
-    capabilities?: string;
 }
 
 /**
