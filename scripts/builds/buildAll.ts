@@ -11,6 +11,7 @@ const manualProcessingItems: string[] = [
 const moduleList = [
   "build-s9y.ts",
   "build-copy-sdk.ts",
+  "build-copy-gateway.ts",
 ];
 
 (async function (mList) {

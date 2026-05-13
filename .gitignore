@@ -5,6 +5,7 @@ build
 examples
 projects
 agent-workspaces
+src
 
 # Logs
 logs

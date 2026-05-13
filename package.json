@@ -15,11 +15,9 @@
   "type": "module",
   "main": "src/main.ts",
   "scripts": {
+    "start": "npm i && (test -f src/index.ts || npm run build) && node --env-file=.env --experimental-strip-types src/index.ts",
     "build": "node --env-file=.env --experimental-strip-types scripts/builds/buildAll.ts",
     "dev": "node --env-file=.env --experimental-strip-types src/index.ts",
-    "test": "node --env-file=.env --experimental-strip-types --test test/**/*.test.ts",
-    "start": "node --env-file=.env --experimental-strip-types src/index.ts",
-    "gateway": "node --env-file=.env --experimental-strip-types build/s9y/src/index.ts",
     "examples": "node  --env-file=.env --experimental-strip-types examples/runner.ts"
   },
   "dependencies": {

@@ -1,8 +1,8 @@
 import fs from "node:fs";
 
 const S9Y_DIR = ".temp/s9y/sdk";
-var S9Y_SDK_DIR = S9Y_DIR;
 const TARGET_DIR = "examples/sdk";
+var S9Y_SDK_DIR = S9Y_DIR;
 
 export default async function main(BUILD_DIR: string) {
   S9Y_SDK_DIR = S9Y_DIR.replace('.temp', BUILD_DIR || 'build');
