@@ -44,22 +44,23 @@ jobs:
         run: |
           # 支持的压缩包扩展名列表
           ARCHIVE_EXTS=(".zip" ".tar.gz" ".tar.bz2" ".tar.xz")
-          FILES=""
           FOUND=false
 
-          # 遍历每种扩展名，收集 build 目录中匹配的文件
-          for ext in "${ARCHIVE_EXTS[@]}"; do
-            for f in build/*"$ext"; do
-              [ -e "$f" ] || continue
-              FOUND=true
-              FILES="${FILES}${f}\n"
+          # 写入 files 多行输出（先写，因为后续可能还需要写其他输出）
+          {
+            echo "files<<EOF"
+            for ext in "${ARCHIVE_EXTS[@]}"; do
+              for f in build/*"$ext"; do
+                [ -e "$f" ] || continue
+                FOUND=true
+                echo "$f"
+              done
             done
-          done
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
-          # 将扫描结果写入 GitHub Actions 输出变量
           if [ "$FOUND" = "true" ]; then
             echo "found=true" >> "$GITHUB_OUTPUT"
-            printf "files=%b\n" "$FILES" >> "$GITHUB_OUTPUT"
           else
             echo "found=false" >> "$GITHUB_OUTPUT"
           fi

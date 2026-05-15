@@ -1,10 +1,10 @@
 import { execSync } from "node:child_process";
-import fs from "node:fs";
-import path from "node:path";
 import { zipDir } from "../utils/zip.ts";
+import path from "node:path";
+import fs from "node:fs";
 
-const TARGET_REPO = "https://github.com/lazier334/open-s9y.git";
-const S9Y_DIR = ".temp/s9y";
+const TARGET_REPO = process.env.TARGET_REPO ?? "https://github.com/lazier334/open-s9y.git";
+const S9Y_DIR = ".temp/open-s9y";
 var S9Y_BUILD_DIR = S9Y_DIR;
 
 function getGitHash(dir: string): string | null {
@@ -104,5 +104,5 @@ export default async function main(BUILD_DIR: string) {
   }
 
   localHash = getGitHash(S9Y_DIR);
-  return `open-s9y 当前版本: [${localHash}](https://github.com/lazier334/open-s9y/commit/${localHash})  \n${msg}`
+  return `open-s9y 当前的提交ID: [${localHash}](https://github.com/lazier334/open-s9y/commit/${localHash})  \n${msg}`
 }
